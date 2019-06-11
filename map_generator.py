@@ -122,10 +122,12 @@ class MazeGenerator:
 
 	def print_final_maze(self):
 		print("[")
+		maze_str = []
 		for j in self._maze:
-			print("  {}".format([
+			maze_str.append("  {}".format([
 				int(not bool(i)) for i in j
 			]))
+		print(",\n".join(maze_str))
 		print("]")
 
 	def print_debug(self):

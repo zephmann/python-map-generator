@@ -8,6 +8,7 @@ import os
 import sys
 import copy
 import json
+import time
 import collections
 
 
@@ -30,6 +31,8 @@ class MazeSolver:
 
 		# list of all locations that have been evaluated
 		self._finished_locations = []
+
+		self._solution = None
 
 		# the maze is always a square so store the length
 		# of one side for easy access
@@ -54,19 +57,21 @@ class MazeSolver:
 			new_dist = self._locations[cur_location]["distance"] + 1
 
 			if cur_location == self._end:
-				print("Fonud it!")
+				self._compile_solution()
 				
 				self._locations[self._end]["iteration"] = i
 				
 				self._finished_locations.append(cur_location)
+
+				print("Final Solution:")
 				break
 
 			# get all valid neighbors of current location
 			neighbors = self._get_neighbors(cur_location)
 
-			print("current location {}".format(cur_location))
+			# print("current location {}".format(cur_location))
 			# print("neighbors {}".format(neighbors))
-			print("")
+			# print("")
 
 			# check if any neighbors haven't been visited yet or
 			# have a distance greater than new_dist, update their
@@ -103,37 +108,39 @@ class MazeSolver:
 
 			self._locations[cur_location]["iteration"] = i
 
-			# print("\n")
+			self._print_debug()
+			print("")
+			time.sleep(0.1)
 
 			i += 1
-			if i > 100:
-				print("breaking!")
+			if i > 10000:
+				# print("breaking!")
 				break
 
 		else:
 			print("No solution found!")
 
-		# print("queue {}".format(self._loc_queue))
-		# or n, v in self._locations.iteritems():
-		# 	print("{}: {}".format(n, v))
-		# print("")
+		self._print_debug()
 
-		print("+" + "-"*(self._maze_side*3) + "+")
+	def _print_debug(self):
+		print("+" + "-"*(self._maze_side*5) + "+")
 		for y, col in enumerate(self._maze):
 			row_str = "|"
 			for x, wall in enumerate(col):
 				if wall:
-					row_str += "---"
+					row_str += "#####"
 				else:
 					d = self._locations[(x,y)]["distance"]
 					# d = self._locations[(x,y)]["iteration"]
-					if d is None:
-						row_str += "   "
+					if d is None or (
+						self._solution and (x,y) not in self._solution
+					):
+						row_str += "     "
 					else:
-						row_str += "{:^ 3}".format(d)
+						row_str += "{:^5}".format(d)
 			row_str += "|"
 			print(row_str)
-		print("+" + "-"*(self._maze_side*3) + "+\n")
+		print("+" + "-"*(self._maze_side*5) + "+\n")
 
 
 	def _get_neighbors(self, position):
@@ -158,6 +165,12 @@ class MazeSolver:
 
 		return neighbors
 
+	def _compile_solution(self):
+		self._solution = []
+		cur_location = self._end
+		while cur_location is not None:
+			self._solution.append(cur_location)
+			cur_location = self._locations[cur_location]["previous"]
 
 
 def parse_file():
