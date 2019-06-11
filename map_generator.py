@@ -120,6 +120,14 @@ class MazeGenerator:
 			print(row_str)
 		print("+" + "-"*(self._total_count*2-1) + "+\n")
 
+	def print_final_maze(self):
+		print("[")
+		for j in self._maze:
+			print("  {}".format([
+				int(not bool(i)) for i in j
+			]))
+		print("]")
+
 	def print_debug(self):
 		print("New spots:\n{}\n".format(json.dumps(self._new_spots)))
 		print("Current spots:\n{}\n".format(json.dumps(self._current_spots)))
@@ -142,4 +150,4 @@ if __name__ == "__main__":
 
 	maze_gen.generate_maze()
 
-	maze_gen.print_maze()
+	maze_gen.print_final_maze()
